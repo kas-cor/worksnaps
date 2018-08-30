@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Worksnaps отчет</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            body {
+                font-family: sans-serif;
+                font-weight: 25px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="res"></div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script type="text/javascript">
+            $(function () {
+                var api_token = (location.search).substr(1);
+                if (api_token) {
+                    start(api_token);
+                } else {
+                    $("#res").html("Укажите API token");
+                }
+
+                function start(api_token) {
+                    var report = [];
+                    $("#res").html("Получение данных пользователя...");
+                    $.post("request.php", {action: 'me', api_token: api_token}, function (res) {
+                        var user = JSON.parse(res)['id'];
+                        $("#res").html("Получение проектов...");
+                        $.post("request.php", {action: 'projects', api_token: api_token}, function (res) {
+                            var projects = [];
+                            res = JSON.parse(res);
+                            for (var i in res['project']) {
+                                projects.push(res['project'][i]['id']);
+                            }
+                            for (var i in projects) {
+                                $.post("request.php", {action: 'report', 'id': projects[i], 'user': user, api_token: api_token}, function (res) {
+                                    var minutes = 0;
+                                    res = JSON.parse(res);
+                                    report.push(res['time_entry']);
+                                    $("#res").html("Получение отчетов по проектам (" + report.length + " из " + projects.length + ")...");
+                                    if (report.length === projects.length) {
+                                        for (var i in report) {
+                                            if (report[i] !== undefined) {
+                                                if (Array.isArray(report[i])) {
+                                                    for (var j in report[i]) {
+                                                        minutes += parseInt(report[i][j]['duration_in_minutes']);
+                                                    }
+                                                } else {
+                                                    minutes += parseInt(report[i]['duration_in_minutes']);
+                                                }
+                                            }
+                                        }
+                                        result(minutes);
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
+
+                function getWorkDays(start) {
+                    var day;
+                    var year = (new Date()).getUTCFullYear();
+                    var month = (new Date()).getMonth();
+                    var work = 0;
+                    for (var date = start; date <= (new Date(year, month + 1, 0)).getDate(); date++) {
+                        day = (new Date(year, month, date)).getDay();
+                        if (day !== 0 && day !== 6) {
+                            work++;
+                        }
+                    }
+                    return work;
+                }
+
+                function result(minutes) {
+                    var date = new Date();
+                    var workdays = getWorkDays(1);
+                    var workdays_left = getWorkDays(date.getDate()) - date.getHours() / 24;
+                    $("#res").html([
+                        '<b>Месяц:</b> ' + date.toLocaleString("ru", {month: 'long'}),
+                        '<b>Рабочих дней:</b> ' + workdays,
+                        '<b>Отработано часов:</b> ' + (minutes / 60).toFixed(2),
+                        '<b>В среднем час./день.:</b> ' + ((minutes / 60) / date.getDate()).toFixed(2),
+                        '<b>Необходимо отработать:</b> ' + (workdays * 8),
+                        '========================',
+                        '<b>Осталось рабочих дней:</b> ' + (workdays_left).toFixed(2),
+                        '<b>Осталось отработать часов:</b> ' + ((workdays * 8) - (minutes / 60)).toFixed(2),
+                        '<b>В среднем час./день.:</b> ' + (((workdays * 8) - (minutes / 60)) / workdays_left).toFixed(2)
+                    ].join("<br />"));
+                }
+            });
+        </script>
+    </body>
+</html>
