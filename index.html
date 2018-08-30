@@ -76,6 +76,7 @@
                 }
 
                 function result(minutes) {
+                    var workhours = 8;
                     var date = new Date();
                     var workdays = getWorkDays(1);
                     var workdays_left = getWorkDays(date.getDate()) - date.getHours() / 24;
@@ -84,11 +85,11 @@
                         '<b>Рабочих дней:</b> ' + workdays,
                         '<b>Отработано часов:</b> ' + (minutes / 60).toFixed(2),
                         '<b>В среднем час./день.:</b> ' + ((minutes / 60) / date.getDate()).toFixed(2),
-                        '<b>Необходимо отработать:</b> ' + (workdays * 8),
+                        '<b>Необходимо отработать:</b> ' + (workdays * workhours),
                         '========================',
                         '<b>Осталось рабочих дней:</b> ' + (workdays_left).toFixed(2),
-                        '<b>Осталось отработать часов:</b> ' + ((workdays * 8) - (minutes / 60)).toFixed(2),
-                        '<b>В среднем час./день.:</b> ' + (((workdays * 8) - (minutes / 60)) / workdays_left).toFixed(2)
+                        '<b>Осталось отработать часов:</b> ' + ((workdays * workhours) - (minutes / 60)).toFixed(2),
+                        '<b>В среднем час./день.:</b> ' + (((workdays * workhours) - (minutes / 60)) / workdays_left).toFixed(2)
                     ].join("<br />"));
                 }
             });
