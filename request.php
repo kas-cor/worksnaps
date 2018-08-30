@@ -2,7 +2,7 @@
 
 Error_Reporting(E_ALL & ~E_NOTICE);
 
-include_once 'Worksnaps.class.php';
+include_once './cls/Worksnaps.class.php';
 
 $worksnaps = New Worksnaps($_POST['api_token']);
 
