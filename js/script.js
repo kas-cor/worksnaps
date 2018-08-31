@@ -63,16 +63,27 @@ $(function () {
         var date = new Date();
         var workdays = getWorkDays(1);
         var workdays_left = getWorkDays(date.getDate()) - date.getHours() / 24;
+        var now_workhours = minutes / 60;
+        var mid_workhours = (workdays * workhours - now_workhours) / (workdays_left > 1 ? workdays_left : 1);
         $("#res").html([
             '<b>Месяц:</b> ' + date.toLocaleString("ru", {month: 'long'}),
             '<b>Рабочих дней:</b> ' + workdays,
-            '<b>Отработано часов:</b> ' + (minutes / 60).toFixed(2),
-            '<b>В среднем час./день.:</b> ' + (minutes / 60 / workdays).toFixed(2),
-            '<b>Необходимо отработать:</b> ' + (workdays * workhours),
+            '<b>Необходимо отработать часов:</b> ' + (workdays * workhours).toFixed(2),
+            '<b>Отработано часов:</b> ' + (now_workhours).toFixed(2),
+            '<b>В среднем час./день.:</b> ' + (now_workhours / workdays).toFixed(2),
             '========================',
             '<b>Осталось рабочих дней:</b> ' + (workdays_left).toFixed(2),
-            '<b>Осталось отработать часов:</b> ' + (workdays * workhours - minutes / 60).toFixed(2),
-            '<b>В среднем час./день.:</b> ' + ((workdays * workhours - minutes / 60) / (workdays_left > 1 ? workdays_left : 1)).toFixed(2)
+            '',
         ].join("<br />"));
+        if (now_workhours < workdays * workhours) {
+            $("#res").append([
+                '<b>Осталось отработать часов:</b> ' + (workdays * workhours - now_workhours).toFixed(2),
+                '<b>В среднем час./день.:</b> ' + (mid_workhours).toFixed(2)
+            ].join("<br />"));
+        } else {
+            $("#res").append([
+                '<b>Переработано часов:</b> ' + (now_workhours - workdays * workhours).toFixed(2),
+            ].join("<br />"));
+        }
     }
 });
