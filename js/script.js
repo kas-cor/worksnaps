@@ -72,7 +72,7 @@ $(function () {
             '========================',
             '<b>Осталось рабочих дней:</b> ' + (workdays_left).toFixed(2),
             '<b>Осталось отработать часов:</b> ' + (workdays * workhours - minutes / 60).toFixed(2),
-            '<b>В среднем час./день.:</b> ' + ((workdays * workhours - minutes / 60) / workdays_left).toFixed(2)
+            '<b>В среднем час./день.:</b> ' + ((workdays * workhours - minutes / 60) / (workdays_left > 1 ? workdays_left : 1)).toFixed(2)
         ].join("<br />"));
     }
 });
