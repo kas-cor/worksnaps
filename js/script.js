@@ -70,7 +70,7 @@ $(function () {
             '<b>Рабочих дней:</b> ' + workdays,
             '<b>Необходимо отработать часов:</b> ' + (workdays * workhours).toFixed(2),
             '<b>Отработано часов:</b> ' + (now_workhours).toFixed(2),
-            '<b>В среднем час./день.:</b> ' + (now_workhours / workdays).toFixed(2),
+            '<b>В среднем час./день.:</b> ' + (now_workhours / (workdays - workdays_left)).toFixed(2),
             '========================',
             '<b>Осталось рабочих дней:</b> ' + (workdays_left).toFixed(2),
             '',
