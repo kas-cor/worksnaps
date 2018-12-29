@@ -3,7 +3,7 @@ $(function () {
     if (api_token) {
         start(api_token);
     } else {
-        $("#res").html('<b>Укажите API token!!!</b><br />' + location.protocol + '//' + location.hostname + '/?API_token');
+        $("#res").html('<b>Укажите API token!</b><br />' + location.protocol + '//' + location.hostname + '/?API_token');
     }
 
     function start(api_token) {
