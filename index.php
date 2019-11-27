@@ -5,7 +5,7 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link rel="Favicon Icon" href="/img/worksnaps.ico"/>
-    <link href="/css/style.css" rel="stylesheet" type="text/css"/>
+    <link href="/css/style.css?nocache=<?= md5(date('dmYHi')) ?>" rel="stylesheet" type="text/css"/>
     <script type="text/javascript" src="/js/script.js?nocache=<?= md5(date('dmYHi')) ?>"></script>
 </head>
 <body>

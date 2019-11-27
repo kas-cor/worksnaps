@@ -2,12 +2,15 @@ body {
     font-family: sans-serif;
     font-size: 16px;
 }
+
 .loading {
     vertical-align: middle;
 }
+
 .instruction {
     display: none;
 }
+
 .instruction img {
     vertical-align: top;
 }
