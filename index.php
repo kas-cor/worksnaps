@@ -10,8 +10,11 @@
 </head>
 <body>
 <div id="res">
-    <img src="/img/loading.svg" class="loading" width="30" height="30" alt=""/>
-    <span class="info"></span>
+    <div class="result"></div>
+    <div>
+        <img src="/img/loading.svg" class="loading" width="30" height="30" alt=""/>
+        <span class="wait"></span>
+    </div>
 </div>
 <ol class="instruction">
     <li><img src="/img/step_1.png" alt="Step 1"/></li>

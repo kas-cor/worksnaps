@@ -3,7 +3,7 @@ body {
     font-size: 16px;
 }
 
-.loading {
+.loading, .ok {
     vertical-align: middle;
 }
 
