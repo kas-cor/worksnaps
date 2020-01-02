@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let count = 0;
     const api_token = (location.search).substr(1);
     if (api_token) {
-        start(api_token).then(show_result);
+        start(api_token).then(show_result).catch(display_text);
     } else {
         display_text(`<b>Укажите API token!</b><br />${location.protocol}//${location.hostname}/?API_token`);
         document.querySelector('.instruction').setAttribute('style', 'display: block');
@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
             user: user.id,
             api_token: api_token
         }).then(report => {
+            if (report.error) throw new Error('Time entry error');
             progress(++count, projects.project.length);
             if (report.time_entry) {
                 if (Array.isArray(report.time_entry)) {
@@ -44,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     display_result(`Задача "${report.time_entry.task_name}" (${report.time_entry.duration_in_minutes} минут)`);
                 }
             }
-        })));
+        }).catch(display_text)));
 
         return minutes;
     }
@@ -109,12 +110,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function isHollyDay(date) {
         const hollyDays2020 = {
             '1.1': 'Новый год',
-            '1.2': 'Новый год',
-            '1.3': 'Новый год',
-            '1.4': 'Новый год',
-            '1.5': 'Новый год',
-            '1.6': 'Новый год',
-            '1.7': 'Рождество',
+            '2.1': 'Новый год',
+            '3.1': 'Новый год',
+            '4.1': 'Новый год',
+            '5.1': 'Новый год',
+            '6.1': 'Новый год',
+            '7.1': 'Рождество',
             '23.2': 'День защитника Отечества',
             '8.3': 'Международный женский день',
             '1.5': 'Праздник Весны и Труда',
