@@ -1,6 +1,6 @@
 # Общий отчет по worksnaps
 
-http://localhost/?<ваш API token>
+http://localhost/?<ваш API token>[&hoursperday=<час./в день(по умолчанию 8)>]
 
 Для получения отчета необходим API token, получаем его здесь:
 
