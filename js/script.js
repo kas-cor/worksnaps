@@ -1,10 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
     let count = 0;
-    const api_token = (location.search).substr(1);
-    if (api_token) {
-        start(api_token).then(show_result).catch(display_text);
+    let url_parse;
+    if ((url_parse = /\?(?=(.*)&hoursperday=(\d+)|(.*))/g.exec(location.search)) !== null) {
+        let api_token, hours_per_day;
+        if (url_parse[3]) {
+            api_token = url_parse[3];
+            hours_per_day = 8;
+        } else {
+            api_token = url_parse[1];
+            hours_per_day = url_parse[2];
+        }
+        start(api_token).then(minutes => show_result(minutes, hours_per_day)).catch(display_text);
     } else {
-        display_text(`<b>Укажите API token!</b><br />${location.protocol}//${location.hostname}/?API_token`);
+        display_text(`<b>Укажите API token!</b><br />${location.protocol}//${location.hostname}/?API_token[&hoursperday=8]`);
         document.querySelector('.instruction').setAttribute('style', 'display: block');
     }
 
@@ -105,9 +113,9 @@ document.addEventListener('DOMContentLoaded', function () {
     /**
      * Праздничные дни (выходные)
      * @param date
-     * @returns {boolean}
+     * @returns {Array}
      */
-    function isHollyDay(date) {
+    function getHollyDay(date) {
         const hollyDays2020 = {
             '1.1': 'Новый год',
             '2.1': 'Новый год',
@@ -124,45 +132,55 @@ document.addEventListener('DOMContentLoaded', function () {
             '4.11': 'День народного единства',
         };
 
-        return hollyDays2020.hasOwnProperty(date);
+        return [hollyDays2020.hasOwnProperty(date), hollyDays2020[date]];
     }
 
     /**
      * Рабочие дни
      * @param start
-     * @returns {number}
+     * @returns {Array}
      */
     function getWorkDays(start) {
-        let day;
+        let day, hollyDay;
         let year = (new Date()).getUTCFullYear();
         let month = (new Date()).getMonth();
         let work = 0;
+        let dont_work = 0;
+        let hollyDays = [];
         for (let date = start; date <= (new Date(year, month + 1, 0)).getDate(); date++) {
             day = (new Date(year, month, date)).getDay();
-            if (day !== 0 && day !== 6 && !isHollyDay(`${date}.${month + 1}`)) {
+            hollyDay = getHollyDay(`${date}.${month + 1}`);
+            if (day !== 0 && day !== 6 && !hollyDay[0]) {
                 work++;
+            } else {
+                dont_work++;
+                if (hollyDay[1] && hollyDays.indexOf(hollyDay[1])) {
+                    hollyDays.push(hollyDay[1]);
+                }
             }
         }
 
-        return work;
+        return [work, dont_work, hollyDays];
     }
 
     /**
      * Вывод результата
      * @param minutes
      */
-    function show_result(minutes) {
-        let work_hours = 8;
-        let date = new Date();
-        let work_days = getWorkDays(1);
-        let work_days_left = getWorkDays(date.getDate()) - date.getHours() / 24;
+    function show_result(minutes, hours_per_day) {
+        const date = new Date();
+        const workDaysAll = getWorkDays(1);
+        const workDaysLeft = getWorkDays(date.getDate());
+        let work_days = workDaysAll[0];
+        let work_days_left = workDaysLeft[0] - date.getHours() / 24;
         let now_work_hours = minutes / 60;
-        let mid_work_hours = (work_days * work_hours - now_work_hours) / (work_days_left > 1 ? work_days_left : 1);
+        let mid_work_hours = (work_days * hours_per_day - now_work_hours) / (work_days_left > 1 ? work_days_left : 1);
 
         display_text([
             `<b>Месяц:</b> ${date.toLocaleString("ru", {month: 'long'})}`,
             `<b>Рабочих дней:</b> ${work_days}`,
-            `<b>Необходимо отработать часов:</b> ${(work_days * work_hours).toFixed(2)}`,
+            `<b>Выходных дней:</b> ${workDaysAll[1]} - (праздники: ${workDaysAll[2].join(', ')})`,
+            `<b>Необходимо отработать часов:</b> ${(work_days * hours_per_day).toFixed(2)} (по ${hours_per_day} час. в день)`,
             `<b>Отработано часов:</b> ${now_work_hours.toFixed(2)}`,
             `<b>В среднем час./день.:</b> ${(now_work_hours / (work_days - work_days_left)).toFixed(2)}`,
             '========================',
@@ -170,14 +188,14 @@ document.addEventListener('DOMContentLoaded', function () {
             '',
         ].join('<br />'));
 
-        if (now_work_hours < work_days * work_hours) {
+        if (now_work_hours < work_days * hours_per_day) {
             display_text(document.querySelector("#res").innerHTML + [
-                `<b>Осталось отработать часов:</b> ${(work_days * work_hours - now_work_hours).toFixed(2)}`,
+                `<b>Осталось отработать часов:</b> ${(work_days * hours_per_day - now_work_hours).toFixed(2)}`,
                 `<b>В среднем час./день.:</b> ${mid_work_hours.toFixed(2)}`
             ].join('<br />'));
         } else {
             display_text(document.querySelector("#res").innerHTML + [
-                `<b>Переработано часов:</b> ${(now_work_hours - work_days * work_hours).toFixed(2)}`,
+                `<b>Переработано часов:</b> ${(now_work_hours - work_days * hours_per_day).toFixed(2)}`,
             ].join('<br />'));
         }
     }
